@@ -151,7 +151,10 @@ function oracle(m) {
 test("200 random markets match exhaustive oracle and resident-optimal bounds", () => {
   let seed = 73;
   const rand = (n) => {
-    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    seed ^= seed << 13;
+    seed ^= seed >>> 17;
+    seed ^= seed << 5;
+    seed >>>= 0;
     return seed % n;
   };
   const shuffle = (items) => {
@@ -211,4 +214,27 @@ test("200 random markets match exhaustive oracle and resident-optimal bounds", (
         );
     }
   }
+});
+
+test("largest complete market enumerates all capacity-feasible assignments", () => {
+  const residents = Array.from({ length: 6 }, (_, i) => ({
+    id: `r${i}`,
+    prefs: ["h0", "h1", "h2", "h3"],
+  }));
+  const hospitals = Array.from({ length: 4 }, (_, i) => ({
+    id: `h${i}`,
+    capacity: 3,
+    prefs: residents.map((r) => r.id).toReversed(),
+  }));
+  const result = analyze({ residents, hospitals });
+  assert.equal(result.alternatives.feasible, 14565);
+  assert.equal(result.alternatives.stable.length, 1);
+  assert.deepEqual(result.residents.assignment, {
+    r0: "h1",
+    r1: "h1",
+    r2: "h1",
+    r3: "h0",
+    r4: "h0",
+    r5: "h0",
+  });
 });

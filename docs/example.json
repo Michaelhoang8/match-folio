@@ -1,0 +1,80 @@
+{
+  "residents": [
+    {
+      "id": "Ada",
+      "prefs": [
+        "Cedar",
+        "Dune"
+      ]
+    },
+    {
+      "id": "Ben",
+      "prefs": [
+        "Dune",
+        "Cedar"
+      ]
+    },
+    {
+      "id": "Cy",
+      "prefs": [
+        "Elm",
+        "Fjord"
+      ]
+    },
+    {
+      "id": "Dee",
+      "prefs": [
+        "Fjord",
+        "Elm"
+      ]
+    },
+    {
+      "id": "Eli",
+      "prefs": [
+        "Cedar"
+      ]
+    },
+    {
+      "id": "Flo",
+      "prefs": [
+        "Cedar"
+      ]
+    }
+  ],
+  "hospitals": [
+    {
+      "id": "Cedar",
+      "capacity": 2,
+      "prefs": [
+        "Eli",
+        "Ben",
+        "Ada",
+        "Flo"
+      ]
+    },
+    {
+      "id": "Dune",
+      "capacity": 1,
+      "prefs": [
+        "Ada",
+        "Ben"
+      ]
+    },
+    {
+      "id": "Elm",
+      "capacity": 1,
+      "prefs": [
+        "Dee",
+        "Cy"
+      ]
+    },
+    {
+      "id": "Fjord",
+      "capacity": 1,
+      "prefs": [
+        "Cy",
+        "Dee"
+      ]
+    }
+  ]
+}
