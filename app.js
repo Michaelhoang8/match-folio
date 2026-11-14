@@ -3,10 +3,14 @@ const $ = (id) => document.getElementById(id);
 let result = null,
   custom = null,
   busy = false,
-  timer = null;
+  timer = null,
+  drawnSignature = null,
+  priorAssignment = {};
 function notice(text, error = false) {
   $("notice").textContent = text;
   $("notice").className = error ? "error" : "";
+  $("preferences-notice").textContent = text;
+  $("preferences-notice").className = error ? "error" : "";
 }
 function stop() {
   if (timer) clearInterval(timer);
@@ -42,60 +46,131 @@ function render() {
     check = audit(m, a),
     run = selected();
   const canvas = $("matching");
-  canvas.replaceChildren();
-  const ry = new Map(
+  const signature = JSON.stringify([m, a]);
+  if (signature !== drawnSignature) {
+    canvas.replaceChildren();
+    const ry = new Map(
       m.residents.map((r, i) => [
         r.id,
-        30 + (i * 280) / Math.max(1, m.residents.length - 1),
+        50 + (i * 400) / Math.max(1, m.residents.length - 1),
       ]),
-    ),
-    hy = new Map(
+    );
+    const hy = new Map(
       m.hospitals.map((h, i) => [
         h.id,
-        45 + (i * 250) / Math.max(1, m.hospitals.length - 1),
+        65 + (i * 370) / Math.max(1, m.hospitals.length - 1),
       ]),
     );
-  for (const r of m.residents)
-    if (a[r.id] !== null)
+    const colors = [
+      "#478e98",
+      "#9275b5",
+      "#bc8652",
+      "#729469",
+      "#b56c85",
+      "#5c83b3",
+    ];
+    m.residents.forEach((r, i) => {
+      if (a[r.id] === null) return;
+      const y1 = ry.get(r.id),
+        y2 = hy.get(a[r.id]);
+      const path = svg("path", {
+        d: `M 205 ${y1} C 420 ${y1}, 430 ${y2}, 650 ${y2}`,
+        class: "connection",
+        stroke: colors[i],
+        pathLength: 1,
+      });
+      canvas.append(path);
+      if (
+        priorAssignment[r.id] !== a[r.id] &&
+        !matchMedia("(prefers-reduced-motion: reduce)").matches
+      )
+        path.animate(
+          [
+            { strokeDasharray: "1", strokeDashoffset: 1, opacity: 0.2 },
+            { strokeDasharray: "1", strokeDashoffset: 0, opacity: 0.7 },
+          ],
+          { duration: 450, easing: "ease-out" },
+        );
+    });
+    m.residents.forEach((r, i) => {
+      const y = ry.get(r.id);
       canvas.append(
-        svg("line", {
-          x1: 175,
-          y1: ry.get(r.id),
-          x2: 550,
-          y2: hy.get(a[r.id]),
+        svg("rect", {
+          class: "resident-card",
+          x: 15,
+          y: y - 27,
+          width: 190,
+          height: 56,
+          rx: 9,
         }),
       );
-  for (const r of m.residents) {
-    const y = ry.get(r.id);
-    canvas.append(svg("circle", { cx: 175, cy: y, r: 5 }));
-    canvas.append(svg("text", { x: 8, y: y - 3 }, r.id));
-    canvas.append(
-      svg("text", { x: 8, y: y + 13, class: "meta" }, a[r.id] ?? "unmatched"),
-    );
-  }
-  for (const h of m.hospitals) {
-    const y = hy.get(h.id),
-      held = Object.values(a).filter((x) => x === h.id).length;
-    canvas.append(
-      svg("rect", { x: 550, y: y - 22, width: 200, height: 47, rx: 3 }),
-    );
-    canvas.append(svg("text", { x: 565, y: y - 2 }, h.id));
-    canvas.append(
-      svg(
-        "text",
-        { x: 565, y: y + 14, class: "meta" },
-        `${held} / ${h.capacity} seats held · ${h.prefs.join(" › ")}`.length >
-          38
-          ? `${held} / ${h.capacity} seats held · ${h.prefs.length} ranked residents`
-          : `${held} / ${h.capacity} seats held · ${h.prefs.join(" › ")}`,
-      ),
-    );
+      canvas.append(
+        svg("circle", { cx: 205, cy: y, r: 5, fill: colors[i], class: "port" }),
+      );
+      canvas.append(
+        svg(
+          "text",
+          {
+            x: 32,
+            y: y - 4,
+            class: r.id.length > 12 ? "name small-name" : "name",
+          },
+          r.id,
+        ),
+      );
+      canvas.append(
+        svg(
+          "text",
+          { x: 32, y: y + 15, class: "meta" },
+          a[r.id] ?? "Unmatched",
+        ),
+      );
+    });
+    for (const h of m.hospitals) {
+      const y = hy.get(h.id),
+        held = Object.values(a).filter((x) => x === h.id).length;
+      canvas.append(
+        svg("rect", {
+          class: "program-card",
+          x: 650,
+          y: y - 34,
+          width: 290,
+          height: 70,
+          rx: 10,
+        }),
+      );
+      canvas.append(svg("text", { x: 668, y: y - 9, class: "name" }, h.id));
+      canvas.append(
+        svg(
+          "text",
+          { x: 668, y: y + 17, class: "meta" },
+          `${held} / ${h.capacity} seats held`,
+        ),
+      );
+      for (let seat = 0; seat < Math.max(held, h.capacity); seat++)
+        canvas.append(
+          svg("circle", {
+            cx: 918 - seat * 17,
+            cy: y + 14,
+            r: 5,
+            class:
+              seat >= h.capacity
+                ? "seat overflow"
+                : seat < held
+                  ? "seat held"
+                  : "seat",
+          }),
+        );
+    }
+    priorAssignment = { ...a };
+    drawnSignature = signature;
   }
   canvas.setAttribute(
     "aria-label",
     m.residents.map((r) => `${r.id}: ${a[r.id] ?? "unmatched"}`).join(", "),
   );
   $("audit").replaceChildren();
+  $("audit").classList.toggle("stable", check.stable);
   const title = document.createElement("b");
   title.textContent = check.stable
     ? "Stable assignment"
@@ -146,6 +221,9 @@ function render() {
       stop();
       custom = { ...assignment(), [r.id]: select.value || null };
       render();
+      for (const field of $("assignments").querySelectorAll("select"))
+        if (field.getAttribute("aria-label") === `Assignment for ${r.id}`)
+          field.focus({ preventScroll: true });
       notice(
         "Manual arrangement audited against the current preference lists.",
       );
@@ -224,6 +302,11 @@ function compute() {
   };
   worker.postMessage(model);
 }
+$("preferences-open").onclick = () => {
+  stop();
+  $("preferences-dialog").showModal();
+};
+$("preferences-close").onclick = () => $("preferences-dialog").close();
 $("outcome").onchange = choose;
 $("restore").onclick = choose;
 $("step").oninput = () => {

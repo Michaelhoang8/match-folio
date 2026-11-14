@@ -14,11 +14,13 @@ Open http://127.0.0.1:8000. Python 3.10+ serves the app; a browser worker perfor
 
 The fictional example has six residents, four programs, and five seats. It contains 175 feasible assignments and exactly four stable outcomes. Ada/Ben and Cy/Dee can exchange programs between stable alternatives. Eli always matches Cedar and Flo remains unmatched in every stable outcome. Switch the proposing side to see the opposite stable extremes.
 
+The matching board connects resident cards to program cards with curved, color-coded paths. Program seat indicators show held, available, and excess seats. Newly changed matches draw briefly during replay; unchanged diagrams remain in place. Manual assignment controls preserve keyboard focus, and the preference editor opens in a dialog. Reduced-motion preferences disable connection animations.
+
 ## Explore
 
 - **Residents propose / Programs propose:** inspect either deferred-acceptance outcome, replay every offer, or scrub the proposal timeline with the keyboard.
 - **Stable alternatives:** choose any exhaustively verified outcome, not just the two algorithm endpoints.
-- **Try another arrangement:** edit individual assignments. The app reports unacceptable matches, over-capacity programs, or concrete blocking pairs with vacant-seat/replacement reasons.
+- **Manual assignment:** edit individual assignments. The app reports unacceptable matches, over-capacity programs, or concrete blocking pairs with vacant-seat/replacement reasons.
 - **Preferences:** edit the JSON market and analyze again. Lists are ordered from best to worst. The editor is a draft; the graph and exports describe the last successful analysis.
 - **Evidence:** export the normalized market, both proposal traces, every stable assignment, each resident's possible stable partners, and the currently inspected assignment with its audit.
 

@@ -3,24 +3,16 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Match Folio — preferences in conversation</title>
+    <title>Match Folio</title>
     <link rel="stylesheet" href="/style.css" />
     <script type="module" src="/app.js"></script>
   </head>
   <body>
     <main>
       <header>
-        <a href="/">Match Folio<span>№ 062</span></a
-        ><span>ALGORITHMIC GAME THEORY</span>
+        <h1>Match Folio</h1>
+        <button id="preferences-open" class="quiet">Preferences</button>
       </header>
-      <section class="intro">
-        <p class="eyebrow">PREFERENCES IN CONVERSATION</p>
-        <h1>There is more than<br />one way to <em>agree.</em></h1>
-        <p>
-          Follow the offers. Explore the alternatives.<br />Find the pairs that
-          would rather choose each other.
-        </p>
-      </section>
       <div class="toolbar">
         <label
           >Outcome<select id="outcome">
@@ -36,12 +28,14 @@
           <div class="board-head">
             <span>RESIDENTS</span><span>PROGRAMS / CAPACITY</span>
           </div>
-          <svg
-            id="matching"
-            viewBox="0 0 760 340"
-            role="img"
-            aria-label="Current matching"
-          ></svg>
+          <div class="graph-scroll">
+            <svg
+              id="matching"
+              viewBox="0 0 960 500"
+              role="img"
+              aria-label="Current matching"
+            ></svg>
+          </div>
           <div class="scrub">
             <input
               id="step"
@@ -55,7 +49,7 @@
           <p id="event">No offers yet.</p>
         </div>
         <aside>
-          <p class="eyebrow">THE COMPLETE PICTURE</p>
+          <p class="eyebrow">EXHAUSTIVE AUDIT</p>
           <strong id="stable-count">—</strong>
           <p>stable outcomes</p>
           <div id="audit" class="audit">Checking the assignment…</div>
@@ -64,7 +58,7 @@
       </section>
       <section class="challenge">
         <div class="section-head">
-          <h2>Try another arrangement.</h2>
+          <h2>Manual assignment</h2>
           <button id="restore" class="quiet">Restore selected outcome</button>
         </div>
         <p class="small">
@@ -73,13 +67,14 @@
         </p>
         <div id="assignments" class="assignments"></div>
       </section>
-      <details>
-        <summary>
-          Read & edit the preferences <span>STRICT LISTS · SMALL MARKETS</span>
-        </summary>
+      <dialog id="preferences-dialog" aria-labelledby="preferences-title">
+        <div class="section-head">
+          <h2 id="preferences-title">Preferences</h2>
+          <button id="preferences-close" class="quiet">Close</button>
+        </div>
+        <p id="preferences-notice" role="status"></p>
         <div class="editor">
           <div>
-            <h2>Order matters.</h2>
             <p>
               Each list runs from most to least preferred. A pair is acceptable
               only when both list each other. Any acceptable match is preferred
@@ -101,9 +96,8 @@
             ><button type="submit">Analyze preferences ↗</button>
           </form>
         </div>
-      </details>
+      </dialog>
       <footer>
-        <span>DEFERRED ACCEPTANCE + EXHAUSTIVE AUDIT</span>
         <p>
           Stability means no mutually preferred deviation under the stated
           lists. It does not establish fairness, total welfare, or the
